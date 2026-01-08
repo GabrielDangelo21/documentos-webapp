@@ -1,14 +1,123 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="pt-BR">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Documentos • Validade & Alertas</title>
+    <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
+    <div class="app">
+        <header class="topbar">
+            <div>
+                <h1>Documentos</h1>
+                <p class="subtitle">Cadastre validades e receba alertas antes do vencimento.</p>
+            </div>
+            <div class="pill" title="Armazenamento local no navegador">
+                <span class="dot"></span>
+                <span>Local</span>
+            </div>
+        </header>
 
+        <main class="grid">
+            <!-- Cadastro -->
+            <section class="card">
+                <div class="card-header">
+                    <h2>Cadastrar documento</h2>
+                    <p class="hint">Use o formato de data do seletor (recomendado no iPhone).</p>
+                </div>
+
+                <form id="form-doc" class="form">
+                    <div class="field">
+                        <label for="nome">Nome do documento</label>
+                        <input id="nome" name="nome" type="text" placeholder="Ex: CNH, Passaporte, Seguro do carro"
+                            autocomplete="off" required />
+                    </div>
+
+                    <div class="row">
+                        <div class="field">
+                            <label for="validade">Data de validade</label>
+                            <input id="validade" name="validade" type="date" required />
+                        </div>
+
+                        <div class="field">
+                            <label for="alerta">Alertar com antecedência</label>
+                            <div class="input-suffix">
+                                <input id="alerta" name="alerta" type="number" min="0" step="1" placeholder="30"
+                                    required />
+                                <span class="suffix">dias</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="actions">
+                        <button type="submit" class="btn primary">Adicionar</button>
+                        <button type="button" id="btn-limpar" class="btn ghost">Limpar</button>
+                    </div>
+
+                    <div id="msg" class="msg" aria-live="polite"></div>
+                </form>
+            </section>
+
+            <!-- Alertas -->
+            <section class="card">
+                <div class="card-header">
+                    <h2>Alertas</h2>
+                    <p class="hint">Aqui vão aparecer vencidos e documentos próximos do vencimento.</p>
+                </div>
+
+                <div class="toolbar">
+                    <button type="button" id="btn-ver-alertas" class="btn soft">Atualizar alertas</button>
+                    <button type="button" id="btn-limpar-tudo" class="btn danger">Apagar tudo</button>
+                </div>
+
+                <div id="alertas-container" class="list">
+                    <div class="empty">
+                        <span class="emoji">✅</span>
+                        <div>
+                            <strong>Nenhum alerta por enquanto</strong>
+                            <p>Cadastre um documento para começar.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Lista de documentos -->
+            <section class="card full">
+                <div class="card-header">
+                    <h2>Seus documentos</h2>
+                    <p class="hint">Lista completa com status e dias restantes.</p>
+                </div>
+
+                <div class="table-head">
+                    <span>Documento</span>
+                    <span>Validade</span>
+                    <span>Dias</span>
+                    <span>Status</span>
+                    <span class="right">Ações</span>
+                </div>
+
+                <div id="lista-container" class="table">
+                    <div class="empty">
+                        <span class="emoji">📄</span>
+                        <div>
+                            <strong>Nenhum documento cadastrado</strong>
+                            <p>Use o formulário acima para adicionar o primeiro.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="footer">
+            <span>Feito para rodar no seu navegador • Sem login • Sem servidor</span>
+        </footer>
+    </div>
+
+    <!-- JS depois: app.js -->
+    <script src="app.js" defer></script>
 </body>
 
 </html>
