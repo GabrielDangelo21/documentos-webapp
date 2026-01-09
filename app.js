@@ -103,6 +103,161 @@ function removerDocumentoPorIndice(idx) {
     salvar();
 }
 
+/* =========================
+   Utilitários para ICS
+   (Eventos de dia inteiro)
+   ========================= */
+
+function pad2(n) {
+    return String(n).padStart(2, "0");
+}
+
+/**
+ * Converte "YYYY-MM-DD" → "YYYYMMDD"
+ */
+function isoParaYYYYMMDD(iso) {
+    const [y, m, d] = iso.split("-").map(Number);
+    return `${y}${pad2(m)}${pad2(d)}`;
+}
+
+/**
+ * Soma ou subtrai dias de uma data ISO
+ * Ex: addDiasISO("2026-05-10", -30)
+ */
+function addDiasISO(iso, deltaDias) {
+    const [y, m, d] = iso.split("-").map(Number);
+    const dt = new Date(y, m - 1, d); // meia-noite local
+    dt.setDate(dt.getDate() + deltaDias);
+
+    return (
+        dt.getFullYear() +
+        "-" +
+        pad2(dt.getMonth() + 1) +
+        "-" +
+        pad2(dt.getDate())
+    );
+}
+
+/**
+ * Timestamp UTC para o DTSTAMP do ICS
+ * Formato: YYYYMMDDTHHMMSSZ
+ */
+function dtstampUTC() {
+    const now = new Date();
+    return (
+        now.getUTCFullYear() +
+        pad2(now.getUTCMonth() + 1) +
+        pad2(now.getUTCDate()) +
+        "T" +
+        pad2(now.getUTCHours()) +
+        pad2(now.getUTCMinutes()) +
+        pad2(now.getUTCSeconds()) +
+        "Z"
+    );
+}
+
+/**
+ * UID único para eventos do calendário
+ */
+function uid(prefix = "evt") {
+    const base =
+        crypto?.randomUUID?.() ??
+        `id-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    return `${prefix}-${base}@documentos-webapp`;
+}
+
+/**
+ * Escapa texto para o padrão ICS
+ */
+function escapeICSText(texto) {
+    return String(texto)
+        .replace(/\\/g, "\\\\")
+        .replace(/,/g, "\\,")
+        .replace(/;/g, "\\;")
+        .replace(/\n/g, "\\n");
+}
+
+/**
+ * Gera um ICS com DOIS EVENTOS:
+ * 1) Evento no dia do alerta
+ * 2) Evento no dia da validade
+ */
+function gerarICSComDoisEventos(doc) {
+    const validadeISO = doc.validade;        // "YYYY-MM-DD"
+    const alertaDias = Number(doc.alerta);
+
+    const alertaISO = addDiasISO(validadeISO, -alertaDias);
+
+    const validadeYYYYMMDD = isoParaYYYYMMDD(validadeISO);
+    const alertaYYYYMMDD = isoParaYYYYMMDD(alertaISO);
+
+    // Evento de dia inteiro → DTEND é o dia seguinte
+    const validadeEnd = isoParaYYYYMMDD(addDiasISO(validadeISO, 1));
+    const alertaEnd = isoParaYYYYMMDD(addDiasISO(alertaISO, 1));
+
+    const stamp = dtstampUTC();
+
+    const eventoAlerta = [
+        "BEGIN:VEVENT",
+        `UID:${uid("alerta")}`,
+        `DTSTAMP:${stamp}`,
+        `SUMMARY:${escapeICSText(`ALERTA: ${doc.nome}`)}`,
+        `DESCRIPTION:${escapeICSText(
+            `Documento "${doc.nome}" vence em ${validadeISO}.`
+        )}`,
+        "TRANSP:TRANSPARENT",
+        `DTSTART;VALUE=DATE:${alertaYYYYMMDD}`,
+        `DTEND;VALUE=DATE:${alertaEnd}`,
+        "END:VEVENT",
+    ].join("\r\n");
+
+    const eventoValidade = [
+        "BEGIN:VEVENT",
+        `UID:${uid("validade")}`,
+        `DTSTAMP:${stamp}`,
+        `SUMMARY:${escapeICSText(`VALIDADE: ${doc.nome}`)}`,
+        `DESCRIPTION:${escapeICSText(
+            `Documento "${doc.nome}" vence hoje (${validadeISO}).`
+        )}`,
+        "TRANSP:TRANSPARENT",
+        `DTSTART;VALUE=DATE:${validadeYYYYMMDD}`,
+        `DTEND;VALUE=DATE:${validadeEnd}`,
+        "END:VEVENT",
+    ].join("\r\n");
+
+    return [
+        "BEGIN:VCALENDAR",
+        "VERSION:2.0",
+        "PRODID:-//Documentos WebApp//PT-BR//EN",
+        "CALSCALE:GREGORIAN",
+        eventoAlerta,
+        eventoValidade,
+        "END:VCALENDAR",
+    ].join("\r\n");
+}
+
+/**
+ * Dispara o download do arquivo .ics
+ */
+function baixarICSDoisEventos(doc) {
+    const ics = gerarICSComDoisEventos(doc);
+    const blob = new Blob([ics], { type: "text/calendar;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `lembretes-${doc.nome
+        .replace(/\s+/g, "-")
+        .toLowerCase()}.ics`;
+
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+
+    URL.revokeObjectURL(url);
+}
+
+
 /* ---------- Renderização ---------- */
 function criarBadge(status) {
     const span = document.createElement("span");
@@ -134,16 +289,19 @@ function renderizarLista() {
         const row = document.createElement("div");
         row.className = "row-item";
         row.innerHTML = `
-      <div>${doc.nome}</div>
-      <div>${doc.validade}</div>
-      <div>${dias}</div>
-      <div></div>
-      <div class="right">
-        <button class="link-btn" data-action="remover" data-index="${idx}">
-          Remover
-        </button>
-      </div>
-    `;
+        <div>${doc.nome}</div>
+        <div>${doc.validade}</div>
+        <div>${dias}</div>
+        <div></div>
+        <div class="right">
+            <button class="link-btn" data-action="calendario" data-index="${idx}">
+            Calendário
+            </button>
+            <button class="link-btn" data-action="remover" data-index="${idx}">
+            Remover
+            </button>
+        </div>
+        `;
 
         row.children[3].appendChild(criarBadge(status));
         listaContainer.appendChild(row);
@@ -223,13 +381,26 @@ function limparTudo() {
 }
 
 function onClickLista(e) {
-    const btn = e.target.closest("[data-action='remover']");
+    const btn = e.target.closest("[data-action]");
     if (!btn) return;
+
+    const action = btn.dataset.action;
     const idx = Number(btn.dataset.index);
-    removerDocumentoPorIndice(idx);
-    renderizarTudo();
-    setMsg("Documento removido.");
+
+    if (action === "remover") {
+        removerDocumentoPorIndice(idx);
+        renderizarTudo();
+        setMsg("Documento removido.");
+        return;
+    }
+
+    if (action === "calendario") {
+        baixarICSDoisEventos(documentos[idx]);
+        setMsg("Arquivo .ics gerado. Abra para adicionar ao calendário.", "info");
+        return;
+    }
 }
+
 
 /* ---------- Init ---------- */
 function init() {
