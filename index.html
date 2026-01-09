@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="style.css" />
     <link rel="icon" type="image/png" href="icon.png">
     <link rel="apple-touch-icon" href="icon.png">
-
 </head>
 
 <body>
@@ -29,7 +28,7 @@
             <section class="card">
                 <div class="card-header">
                     <h2>Cadastrar documento</h2>
-                    <p class="hint">Use o formato de data do seletor (recomendado no iPhone).</p>
+                    <p class="hint">Use o seletor de data para evitar erros de formato.</p>
                 </div>
 
                 <form id="form-doc" class="form">
@@ -68,7 +67,7 @@
             <section class="card">
                 <div class="card-header">
                     <h2>Alertas</h2>
-                    <p class="hint">Aqui vão aparecer vencidos e documentos próximos do vencimento.</p>
+                    <p class="hint">Aqui aparecem vencidos e documentos próximos do vencimento.</p>
                 </div>
 
                 <div class="toolbar">
@@ -76,15 +75,7 @@
                     <button type="button" id="btn-limpar-tudo" class="btn danger">Apagar tudo</button>
                 </div>
 
-                <div id="alertas-container" class="list">
-                    <div class="empty">
-                        <span class="emoji">✅</span>
-                        <div>
-                            <strong>Nenhum alerta por enquanto</strong>
-                            <p>Cadastre um documento para começar.</p>
-                        </div>
-                    </div>
-                </div>
+                <div id="alertas-container" class="list"></div>
             </section>
 
             <!-- Lista de documentos -->
@@ -92,6 +83,23 @@
                 <div class="card-header">
                     <h2>Seus documentos</h2>
                     <p class="hint">Lista completa com status e dias restantes.</p>
+                </div>
+
+                <div class="table-controls">
+                    <div class="field compact">
+                        <label for="buscar">Buscar</label>
+                        <input id="buscar" type="text" placeholder="Digite parte do nome…" />
+                    </div>
+
+                    <div class="field compact">
+                        <label for="ordenar">Ordenar por</label>
+                        <select id="ordenar">
+                            <option value="validade_asc">Validade (mais próxima)</option>
+                            <option value="validade_desc">Validade (mais distante)</option>
+                            <option value="nome_asc">Nome (A–Z)</option>
+                            <option value="nome_desc">Nome (Z–A)</option>
+                        </select>
+                    </div>
                 </div>
 
                 <div class="table-head">
@@ -102,15 +110,7 @@
                     <span class="right">Ações</span>
                 </div>
 
-                <div id="lista-container" class="table">
-                    <div class="empty">
-                        <span class="emoji">📄</span>
-                        <div>
-                            <strong>Nenhum documento cadastrado</strong>
-                            <p>Use o formulário acima para adicionar o primeiro.</p>
-                        </div>
-                    </div>
-                </div>
+                <div id="lista-container" class="table"></div>
             </section>
         </main>
 
@@ -119,7 +119,40 @@
         </footer>
     </div>
 
-    <!-- JS depois: app.js -->
+    <!-- Modal de edição -->
+    <dialog id="dlg-editar" class="dialog">
+        <form method="dialog" class="dialog-card" id="form-editar">
+            <div class="dialog-head">
+                <h3>Editar documento</h3>
+                <button class="icon-btn" value="cancel" aria-label="Fechar">✕</button>
+            </div>
+
+            <div class="form">
+                <div class="field">
+                    <label for="edit-nome">Nome</label>
+                    <input id="edit-nome" type="text" required />
+                </div>
+
+                <div class="row">
+                    <div class="field">
+                        <label for="edit-validade">Validade</label>
+                        <input id="edit-validade" type="date" required />
+                    </div>
+
+                    <div class="field">
+                        <label for="edit-alerta">Alerta (dias)</label>
+                        <input id="edit-alerta" type="number" min="0" step="1" required />
+                    </div>
+                </div>
+
+                <div class="actions">
+                    <button type="submit" class="btn primary">Salvar</button>
+                    <button type="button" id="btn-cancelar-edicao" class="btn ghost">Cancelar</button>
+                </div>
+            </div>
+        </form>
+    </dialog>
+
     <script src="app.js" defer></script>
 </body>
 

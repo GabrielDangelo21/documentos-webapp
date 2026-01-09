@@ -84,11 +84,14 @@ def listar_alertas(documentos: list[dict]) -> None:
     for documento in documentos:
         nome = documento['nome']
         dias, status = calcular_status(documento)
+        if status == "ok":
+            continue
+
+        alerta_encontrado = True
         if dias < 0:
             print(f'{nome} | vencido há {-(dias)} dia(s)| {status}')
         else:    
             print(f'{nome} | vence em {dias} dia(s) | {status}')
-        alerta_encontrado = True
     if not alerta_encontrado:
         print('Nenhum documento em alerta.')
 
@@ -245,94 +248,93 @@ def main() -> None:
                 print('Nenhum documento encontrado.')
                 print('=================================')
                 continue
-            else:
-                print('=================================')
-                resultados_ordenados = listar_documentos_com_indice(resultados)
-                print('=================================')
+            
+            print('=================================')
+            resultados_ordenados = listar_documentos_com_indice(resultados)
+            print('=================================')
 
-                while True:
-                    indice = ler_int('Digite o número do documento que deseja editar: ')
-                    if indice < 1 or indice > len(resultados_ordenados):
-                        print('=================================')
-                        print('Número de documento inválido.')
-                        print('=================================')
-                        continue
-                    else:
+            while True:
+                indice = ler_int('Digite o número do documento que deseja editar: ')
+                if indice < 1 or indice > len(resultados_ordenados):
+                    print('=================================')
+                    print('Número de documento inválido.')
+                    print('=================================')
+                    continue
+                break
 
-                        while True:
-                            doc_escolhido = resultados_ordenados[indice - 1]
-                            nome_antes = doc_escolhido['nome']
-                            validade_antes = doc_escolhido['validade']
-                            alerta_antes = doc_escolhido['alerta']
-                            mostrar_menu_edicao()
-                            alterou = False
-                            dias_antes, status_antes = calcular_status(doc_escolhido)
-                            opcao_edicao = ler_int('Escolha uma opção: ')
-                            if opcao_edicao == 1:
-                                novo_nome = ler_str('Digite o novo nome: ')
-                                doc_escolhido['nome'] = novo_nome
-                                alterou = True
+            doc_escolhido = resultados_ordenados[indice - 1]
 
-                            elif opcao_edicao == 2:
-                                nova_validade = ler_data('Digite a nova data de validade: YYYY-MM-DD ')
-                                doc_escolhido['validade'] = nova_validade
-                                alterou = True
-                            
-                            elif opcao_edicao == 3:
-                                while True:
-                                    novo_alerta = ler_int('Digite os dias para o novo alerta: ')
-                                    if novo_alerta < 0:
-                                        print('=================================')
-                                        print('Valor inválido (não pode ser negativo) ')
-                                        print('=================================')
-                                        continue
-                                    doc_escolhido['alerta'] = novo_alerta
-                                    alterou = True
-                                    break
+            while True:
+                mostrar_menu_edicao()
+                opcao_edicao = ler_int('Escolha uma opção: ')
 
-                            elif opcao_edicao == 4:
-                                print('=================================')
-                                print('Cancelando...')
-                                print('=================================')
-                                break
-                            else:
-                                print('=================================')
-                                print('Opção inválida. Tente novamente.')
-                                print('=================================')
-                            if alterou:
-                                nome_editado = doc_escolhido['nome']
-                                dias_editado, status_editado = calcular_status(doc_escolhido)
-                                print('=================================')
-                                print('Alteração pronta. Confirme.')
-                                print('Antes')
-                                if dias_antes < 0:
-                                    print(f'{nome_antes} | validade {validade_antes} | vencido há {-(dias_antes)} dia(s) | {status_antes}')
-                                else:    
-                                    print(f'{nome_antes} | validade {doc_escolhido['validade']} | vence em {dias_antes} dia(s) | alerta para {doc_escolhido['alerta']} | {status_antes}')
-                                print('Depois')
-                                print(f"{nome_editado} | validade {doc_escolhido['validade']} | vence em {dias_editado} dia(s) | alerta para {doc_escolhido['alerta']} dia(s) | {status_editado}")
-                                print('=================================')
-                                while True:
-                                    opcao_confirmacao = ler_str('Deseja salvar a alteração? (s/n)').strip().lower()
-                                    if opcao_confirmacao == 's':
-                                        salvar_documento(documentos, caminho)
-                                        print('=================================')
-                                        print('Salvo com sucesso.')
-                                        print('=================================')
-                                        break
-                                    elif opcao_confirmacao == 'n':
-                                        doc_escolhido['nome'] = nome_antes
-                                        doc_escolhido['validade'] = validade_antes
-                                        doc_escolhido['alerta'] = alerta_antes
-                                        print('=================================')
-                                        print('Alterações descartadas.')
-                                        print('=================================')
-                                        break
-                                    else:
-                                        print('Digite s ou n')
+                if opcao_edicao == 4:
+                    print('=================================')
+                    print('Cancelando...')
+                    print('=================================')
                     break
 
+                if opcao_edicao not in (1, 2, 3):
+                    print('=================================')
+                    print('Opção inválida. Tente novamente.')
+                    print('=================================')
+                    continue
 
+                nome_antes = doc_escolhido['nome']
+                validade_antes = doc_escolhido['validade']
+                alerta_antes = doc_escolhido['alerta']
+                dias_antes, status_antes = calcular_status(doc_escolhido)
+                
+                if opcao_edicao == 1:
+                    doc_escolhido['nome'] = ler_str('Digite o novo nome: ')
+
+                elif opcao_edicao == 2:
+                    doc_escolhido['validade'] = ler_data('Digite a nova data de validade: YYYY-MM-DD ')
+                
+                elif opcao_edicao == 3:
+                    while True:
+                        novo_alerta = ler_int('Digite os dias para o novo alerta: ')
+                        if novo_alerta < 0:
+                            print('=================================')
+                            print('Valor inválido (não pode ser negativo) ')
+                            print('=================================')
+                            continue
+                        doc_escolhido['alerta'] = novo_alerta
+                        break
+
+                nome_editado = doc_escolhido['nome']
+                dias_editado, status_editado = calcular_status(doc_escolhido)
+                print('=================================')
+                print('Alteração pronta. Confirme.')
+                print('Antes')
+                if dias_antes < 0:
+                    print(f"{nome_antes} | validade {validade_antes} | vencido há {-(dias_antes)} dia(s) | {status_antes}")
+                else:    
+                    print(f"{nome_antes} | validade {validade_antes} | vence em {dias_antes} dia(s) | alerta para {alerta_antes} | {status_antes}")
+                print('Depois')
+                if dias_editado < 0:
+                    print(f"{nome_editado} | validade {doc_escolhido['validade']} | vencido há {-(dias_editado)} dia(s) | {status_editado}")
+                else:    
+                    print(f"{nome_editado} | validade {doc_escolhido['validade']} | vence em {dias_editado} dia(s) | alerta para {doc_escolhido['alerta']} | {status_editado}")
+                print('=================================')
+                while True:
+                    opcao_confirmacao = ler_str('Deseja salvar a alteração? (s/n)').strip().lower()
+                    if opcao_confirmacao == 's':
+                        salvar_documento(documentos, caminho)
+                        print('=================================')
+                        print('Salvo com sucesso.')
+                        print('=================================')
+                        break
+                    elif opcao_confirmacao == 'n':
+                        doc_escolhido['nome'] = nome_antes
+                        doc_escolhido['validade'] = validade_antes
+                        doc_escolhido['alerta'] = alerta_antes
+                        print('=================================')
+                        print('Alterações descartadas.')
+                        print('=================================')
+                        break
+                    else:
+                        print('Digite s ou n')
 
         elif opcao == 7:
             salvar_documento(documentos, caminho)
