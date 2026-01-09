@@ -340,6 +340,24 @@ input:focus {
     text-align: center;
 }
 
+/* Espaçamento e alinhamento dos botões de ação */
+.row-item .right {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.row-item .link-btn[data-action="calendario"] {
+    color: rgba(35, 192, 255, 0.9);
+}
+
+.row-item .link-btn[data-action="calendario"]:hover {
+    color: #23c0ff;
+}
+
+
+
 /* Mobile */
 @media (max-width: 920px) {
     .grid {
@@ -371,5 +389,13 @@ input:focus {
 
     .right {
         text-align: left;
+    }
+}
+
+@media (max-width: 540px) {
+    .row-item .right {
+        justify-content: flex-start;
+        gap: 12px;
+        margin-top: 6px;
     }
 }
