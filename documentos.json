@@ -16,5 +16,17 @@
     "validade": "2029-05-25",
     "alerta": 60,
     "categoria": "Pessoal"
+  },
+  {
+    "nome": "Tessera sanit\u00e1ria",
+    "validade": "2028-02-15",
+    "alerta": 60,
+    "categoria": "Outros"
+  },
+  {
+    "nome": "teste",
+    "validade": "2026-12-31",
+    "alerta": 90,
+    "categoria": "Outros"
   }
 ]

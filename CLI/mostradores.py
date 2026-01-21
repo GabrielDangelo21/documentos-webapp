@@ -8,10 +8,11 @@ def mostrar_menu() -> None:
     print("\n=== GERENCIADOR DE DOCUMENTOS ===")
     print("1. Cadastrar documentos")
     print("2. Listar documentos")
-    print("3. Ver alertas")
-    print("4. Buscar documento")
-    print("5. Remover documento")
+    print("3. Listar documentos por categoria")
+    print("4. Listar alertas")
+    print("5. Buscar documento")
     print("6. Editar documento")
+    print("7. Remover documento")
     print("0. Sair")
 
 

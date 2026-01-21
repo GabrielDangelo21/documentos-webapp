@@ -1,5 +1,10 @@
 from leitores import ler_categoria, ler_data, ler_int, ler_str
-from servicos import buscar_documentos, cadastrar_documento, calcular_status
+from servicos import (
+    buscar_documentos,
+    cadastrar_documento,
+    calcular_status,
+    listar_por_categoria,
+)
 from salvamento import carregar_documentos, salvar_documento
 from mostradores import (
     listar_alertas,
@@ -43,11 +48,23 @@ def main() -> None:
             print("=================================")
 
         elif opcao == 3:
+            categoria = ler_categoria()
+            filtrados = listar_por_categoria(documentos, categoria)
+            if not filtrados:
+                print("=================================")
+                print(f"Nenhum documento encontrado na categoria {categoria}")
+                print("=================================")
+            else:
+                print("=================================")
+                listar_documentos(filtrados)
+                print("=================================")
+
+        elif opcao == 4:
             print("=================================")
             listar_alertas(documentos)
             print("=================================")
 
-        elif opcao == 4:
+        elif opcao == 5:
             try:
                 termo = ler_str("Digite o nome do documento: ")
                 documentos_encontrados = buscar_documentos(documentos, termo)
@@ -63,52 +80,6 @@ def main() -> None:
 
             except ValueError as e:
                 print(f"Erro: {e}")
-
-        elif opcao == 5:
-            termo = ler_str("Qual documento deseja remover? ")
-            resultados = buscar_documentos(documentos, termo)
-            if not resultados:
-                print("=================================")
-                print("Nenhum documento encontrado.")
-                print("=================================")
-                continue
-            else:
-                print("=================================")
-                resultados_ordenados = listar_documentos_com_indice(resultados)
-                print("=================================")
-                while True:
-                    indice = ler_int(
-                        "Digite o número do documento que deseja remover: "
-                    )
-                    if indice < 1 or indice > len(resultados_ordenados):
-                        print("=================================")
-                        print("Número de documento inválido.")
-                        print("=================================")
-                        continue
-
-                    doc_escolhido = resultados_ordenados[indice - 1]
-
-                    while True:
-                        opcao_confirmacao = (
-                            ler_str("Deseja mesmo remover o documento? (s/n)")
-                            .strip()
-                            .lower()
-                        )
-                        if opcao_confirmacao == "s":
-                            documentos.remove(doc_escolhido)
-                            salvar_documento(documentos, caminho)
-                            print("=================================")
-                            print("Documento removido com sucesso.")
-                            print("=================================")
-                            break
-                        elif opcao_confirmacao == "n":
-                            print("=================================")
-                            print("Remoção cancelada.")
-                            print("=================================")
-                            break
-                        else:
-                            print("Digite s ou n")
-                    break
 
         elif opcao == 6:
             termo = ler_str("Qual documento deseja editar? ")
@@ -222,6 +193,52 @@ def main() -> None:
                         break
                     else:
                         print("Digite s ou n")
+
+        elif opcao == 7:
+            termo = ler_str("Qual documento deseja remover? ")
+            resultados = buscar_documentos(documentos, termo)
+            if not resultados:
+                print("=================================")
+                print("Nenhum documento encontrado.")
+                print("=================================")
+                continue
+            else:
+                print("=================================")
+                resultados_ordenados = listar_documentos_com_indice(resultados)
+                print("=================================")
+                while True:
+                    indice = ler_int(
+                        "Digite o número do documento que deseja remover: "
+                    )
+                    if indice < 1 or indice > len(resultados_ordenados):
+                        print("=================================")
+                        print("Número de documento inválido.")
+                        print("=================================")
+                        continue
+
+                    doc_escolhido = resultados_ordenados[indice - 1]
+
+                    while True:
+                        opcao_confirmacao = (
+                            ler_str("Deseja mesmo remover o documento? (s/n)")
+                            .strip()
+                            .lower()
+                        )
+                        if opcao_confirmacao == "s":
+                            documentos.remove(doc_escolhido)
+                            salvar_documento(documentos, caminho)
+                            print("=================================")
+                            print("Documento removido com sucesso.")
+                            print("=================================")
+                            break
+                        elif opcao_confirmacao == "n":
+                            print("=================================")
+                            print("Remoção cancelada.")
+                            print("=================================")
+                            break
+                        else:
+                            print("Digite s ou n")
+                    break
 
         else:
             print("=================================")

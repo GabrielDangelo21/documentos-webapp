@@ -50,3 +50,14 @@ def buscar_documentos(documentos: List[dict], termo) -> List[dict]:
         if termo.lower() in nome.lower():
             resultados.append(documento)
     return resultados
+
+
+def listar_por_categoria(documentos: List[dict], categoria: str) -> List[dict]:
+    if not categoria:
+        categoria = configuracao.categoria_padrao
+    resultados = []
+    for documento in documentos:
+        categoria_escolhida = documento.get("categoria", configuracao.categoria_padrao)
+        if categoria == categoria_escolhida:
+            resultados.append(documento)
+    return resultados
