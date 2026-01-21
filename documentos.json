@@ -2,11 +2,19 @@
   {
     "nome": "Passaporte Gabi",
     "validade": "2025-02-15",
-    "alerta": 60
+    "alerta": 60,
+    "categoria": "Pessoal"
   },
   {
     "nome": "passaporte kleyte",
     "validade": "2028-05-29",
-    "alerta": 60
+    "alerta": 60,
+    "categoria": "Pessoal"
+  },
+  {
+    "nome": "Passaporte Isabela",
+    "validade": "2029-05-25",
+    "alerta": 60,
+    "categoria": "Pessoal"
   }
 ]
