@@ -307,9 +307,9 @@ function renderizarLista() {
       <div>${diasTxt}</div>
       <div></div>
       <div class="right">
-        <button class="link-btn" data-action="editar" data-index="${idxReal}">Editar</button>
-        <button class="link-btn" data-action="calendario" data-index="${idxReal}">Calendário</button>
-        <button class="link-btn" data-action="remover" data-index="${idxReal}">Remover</button>
+        <button class="link-btn" data-action="editar" data-index="${idxReal}">✏️ Editar</button>
+        <button class="link-btn" data-action="calendario" data-index="${idxReal}">📅 Calendário</button>
+        <button class="link-btn" data-action="remover" data-index="${idxReal}">🗑️ Remover</button>
       </div>
     `;
 
