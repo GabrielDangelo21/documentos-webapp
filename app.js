@@ -143,7 +143,16 @@ function addDiasISO(iso, deltaDias) {
         pad2(dt.getDate())
     );
 }
+
+
+
+function formatarDataBR(iso) {
+    const [y, m, d] = iso.split("-");
+    return `${d}/${m}/${y}`;
+}
+
 function dtstampUTC() {
+
     const now = new Date();
     return (
         now.getUTCFullYear() +
@@ -294,7 +303,7 @@ function renderizarLista() {
 
         row.innerHTML = `
       <div>${doc.nome}</div>
-      <div>${doc.validade}</div>
+      <div>${formatarDataBR(doc.validade)}</div>
       <div>${diasTxt}</div>
       <div></div>
       <div class="right">
@@ -334,7 +343,7 @@ function renderizarAlertas() {
         item.className = "row-item";
         item.innerHTML = `
       <div>${doc.nome}</div>
-      <div>${doc.validade}</div>
+      <div>${formatarDataBR(doc.validade)}</div>
       <div>${dias}</div>
       <div></div>
       <div></div>
