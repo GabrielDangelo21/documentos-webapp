@@ -6,6 +6,7 @@
    ========================= */
 
 const STORAGE_KEY = "documentos_v1";
+const STORAGE_KEY_SORT = "ordenacao_v1";
 
 /* ---------- Estado ---------- */
 let documentos = [];
@@ -39,7 +40,14 @@ const editValidade = $("#edit-validade");
 const editAlerta = $("#edit-alerta");
 const btnCancelarEdicao = $("#btn-cancelar-edicao");
 
+/* Dialog confirmação */
+const dlgConfirmacao = $("#dlg-confirmacao");
+const msgConfirmacao = $("#msg-confirmacao");
+const btnCancelarConf = $("#btn-cancelar-conf");
+const btnConfirmarConf = $("#btn-confirmar-conf");
+
 let idxEditando = null;
+let callbackConfirmacao = null;
 
 /* ---------- Utilitários ---------- */
 function setMsg(texto, tipo = "info") {
@@ -383,11 +391,12 @@ function limparFormulario() {
 }
 
 function limparTudo() {
-    if (!confirm("Tem certeza que deseja apagar todos os documentos?")) return;
-    documentos = [];
-    salvar();
-    renderizarTudo();
-    setMsg("Todos os documentos foram removidos.");
+    abrirConfirmacao("Tem certeza que deseja apagar todos os documentos?", () => {
+        documentos = [];
+        salvar();
+        renderizarTudo();
+        setMsg("Todos os documentos foram removidos.");
+    });
 }
 
 function abrirEdicao(idx) {
@@ -404,6 +413,24 @@ function abrirEdicao(idx) {
 function fecharEdicao() {
     idxEditando = null;
     if (dlgEditar.open) dlgEditar.close();
+}
+
+function ppp_dummy() { } // placeholder to keep line numbers consistent if needed, or just remove
+
+function abrirConfirmacao(texto, onConfirm) {
+    msgConfirmacao.textContent = texto;
+    callbackConfirmacao = onConfirm;
+    dlgConfirmacao.showModal();
+}
+
+function fecharConfirmacao() {
+    callbackConfirmacao = null;
+    if (dlgConfirmacao.open) dlgConfirmacao.close();
+}
+
+function onConfirmarAcao() {
+    if (callbackConfirmacao) callbackConfirmacao();
+    fecharConfirmacao();
 }
 
 function onSalvarEdicao(e) {
@@ -433,10 +460,11 @@ function onClickLista(e) {
     const idx = Number(btn.dataset.index);
 
     if (action === "remover") {
-        if (!confirm("Remover este documento?")) return;
-        removerDocumentoPorIndice(idx);
-        renderizarTudo();
-        setMsg("Documento removido.");
+        abrirConfirmacao("Remover este documento?", () => {
+            removerDocumentoPorIndice(idx);
+            renderizarTudo();
+            setMsg("Documento removido.");
+        });
         return;
     }
 
@@ -459,12 +487,21 @@ function onBuscar(e) {
 
 function onOrdenar(e) {
     ordenacao = e.target.value;
+    localStorage.setItem(STORAGE_KEY_SORT, ordenacao);
     renderizarLista();
 }
 
 /* ---------- Init ---------- */
 function init() {
     documentos = carregar();
+
+    // Carregar ordenação salva
+    const savedSort = localStorage.getItem(STORAGE_KEY_SORT);
+    if (savedSort) {
+        ordenacao = savedSort;
+        selectOrdenar.value = savedSort;
+    }
+
     renderizarTudo();
 
     form.addEventListener("submit", onSubmitForm);
@@ -488,6 +525,21 @@ function init() {
             ev.clientY >= rect.top &&
             ev.clientY <= rect.bottom;
         if (!inside) fecharEdicao();
+    });
+
+    // Eventos do modal de confirmação
+    btnConfirmarConf.addEventListener("click", onConfirmarAcao);
+    btnCancelarConf.addEventListener("click", fecharConfirmacao);
+
+    // Fechar dialog confirmação clicando fora
+    dlgConfirmacao.addEventListener("click", (ev) => {
+        const rect = dlgConfirmacao.getBoundingClientRect();
+        const inside =
+            ev.clientX >= rect.left &&
+            ev.clientX <= rect.right &&
+            ev.clientY >= rect.top &&
+            ev.clientY <= rect.bottom;
+        if (!inside) fecharConfirmacao();
     });
 }
 

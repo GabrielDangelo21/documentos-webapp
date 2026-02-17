@@ -47,8 +47,8 @@
                         <div class="field">
                             <label for="alerta">Alertar com antecedência</label>
                             <div class="input-suffix">
-                                <input id="alerta" name="alerta" type="number" min="0" step="1" value="180" placeholder="180"
-                                    required />
+                                <input id="alerta" name="alerta" type="number" min="0" step="1" value="180"
+                                    placeholder="180" required />
                                 <span class="suffix">dias</span>
                             </div>
                         </div>
@@ -148,6 +148,23 @@
                 <div class="actions">
                     <button type="submit" class="btn primary">Salvar</button>
                     <button type="button" id="btn-cancelar-edicao" class="btn ghost">Cancelar</button>
+                </div>
+            </div>
+        </form>
+    </dialog>
+
+    <!-- Modal de confirmação -->
+    <dialog id="dlg-confirmacao" class="dialog">
+        <form method="dialog" class="dialog-card">
+            <div class="dialog-head">
+                <h3>Confirmação</h3>
+                <button class="icon-btn" value="cancel" aria-label="Fechar">✕</button>
+            </div>
+            <div class="form">
+                <p id="msg-confirmacao" style="margin-bottom: 20px; color: var(--text); font-size: 14px;"></p>
+                <div class="actions" style="justify-content: flex-end;">
+                    <button type="button" id="btn-cancelar-conf" class="btn ghost">Cancelar</button>
+                    <button type="button" id="btn-confirmar-conf" class="btn danger">Confirmar</button>
                 </div>
             </div>
         </form>
